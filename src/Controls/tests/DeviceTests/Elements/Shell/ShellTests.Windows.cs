@@ -121,26 +121,20 @@ namespace Microsoft.Maui.DeviceTests
 				shell.Items.Add(shellItem);
 			});
 
-			await InvokeOnMainThreadAsync(async () =>
-			{
-				await CreateHandlerAndAddToWindow<ShellHandler>(shell, (handler) =>
-				{
-					var rootNavView = handler.PlatformView;
-					var shellItemView = shell.CurrentItem.Handler.PlatformView as MauiNavigationView;
-					var expectedRoot = UI.Xaml.Controls.NavigationViewPaneDisplayMode.Left;
-					var expectedShellItems = UI.Xaml.Controls.NavigationViewPaneDisplayMode.LeftMinimal;
-
-					Assert.Equal(expectedRoot, rootNavView.PaneDisplayMode);
-					Assert.NotNull(shellItemView);
-					Assert.Equal(expectedShellItems, shellItemView.PaneDisplayMode);
-
-					return Task.CompletedTask;
-				});
-
-				await AssertEventually(() => IsViewLaidOut(shell.Handler.PlatformView));
-			});
-
 			await ValidateHasColor(shell, expectedColor, typeof(ShellHandler));
+
+			await InvokeOnMainThreadAsync(() =>
+			{
+				var shellItemView = shell.CurrentItem.Handler.PlatformView as MauiNavigationView;
+				var expectedRoot = UI.Xaml.Controls.NavigationViewPaneDisplayMode.Left;
+				var expectedShellItems = UI.Xaml.Controls.NavigationViewPaneDisplayMode.LeftMinimal;
+
+				var shellView = shell.Handler.PlatformView as ShellView;
+
+				Assert.Equal(expectedRoot, shellView.PaneDisplayMode);
+				Assert.NotNull(shellItemView);
+				Assert.Equal(expectedShellItems, shellItemView.PaneDisplayMode);
+			});
 		}
 
 		[Fact(DisplayName = "Back Button Enabled/Disabled")]
